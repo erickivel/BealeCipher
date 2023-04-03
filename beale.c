@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "beale.h"
 #include "list.h"
 
 int wordCount = 0;
@@ -18,24 +19,70 @@ void addCharacter(struct CharList *list, char ch) {
   wordCount++;
 }
 
-void printList(struct CharList *list) {
-  struct CharNode *charNode = list->head;
-  while (charNode != NULL) {
-    printf("%c: ", charNode->value);
-    struct KeyNode *keyNode = charNode->keyList->head;
+struct CharList *readCipherBook(char *cipherBookPath) {
+  struct CharList *list = createCharList();
 
-    while (keyNode != NULL) {
-      printf("%d ", keyNode->value);
-      keyNode = keyNode->next;
+  FILE *book = fopen(cipherBookPath, "r");
+
+  int lastSpace = 1;
+  char ch = getc(book);
+
+  while (ch != EOF) {
+    if (lastSpace && !isspace(ch) && !ispunct(ch)) {
+      ch = tolower(ch);
+      addCharacter(list, ch);
     }
 
-    charNode = charNode->next;
-    printf("\n");
+    lastSpace = isspace(ch) ? 1 : 0;
+
+    ch = getc(book);
   }
+
+  fclose(book);
+  return list;
 }
 
-void writeKeyListFile(struct CharList *list) {
-  FILE *keyFile = fopen("keyList.txt", "w+");
+struct CharList *readKeysFile(char *keysFilePath) {
+  struct CharList *list = createCharList();
+
+  FILE *keys = fopen(keysFilePath, "r");
+
+  int lastWasLinefeed = 1;
+  int lastWasSpace = 0;
+  char ch = getc(keys);
+  char *numberStr = "";
+
+  while (ch != EOF) {
+    if (lastWasLinefeed) {
+      printf("\n%c: ", ch);
+    }
+
+    if (strlen(numberStr) != 0) {
+      if (ch != ' ') {
+        printf("%s ", numberStr);
+        numberStr = "";
+      } else {
+        strcat(numberStr, &ch);
+      }
+    }
+
+    if (lastWasSpace) {
+      numberStr = &ch;
+    }
+
+    lastWasSpace = (ch == ' ') ? 1 : 0;
+    lastWasLinefeed = (ch == '\n') ? 1 : 0;
+
+    ch = getc(keys);
+  }
+
+  fclose(keys);
+
+  return list;
+}
+
+void writeKeyListFile(struct CharList *list, char *keysFilePath) {
+  FILE *keyFile = fopen(keysFilePath, "w+");
 
   struct CharNode *charNode = list->head;
   while (charNode != NULL) {
@@ -43,10 +90,9 @@ void writeKeyListFile(struct CharList *list) {
     struct KeyNode *keyNode = charNode->keyList->head;
 
     while (keyNode != NULL) {
-      char keyChar[64];
-      sprintf(keyChar, "%d ", keyNode->value);
-      fputs(keyChar, keyFile);
-      // printf("%d ", keyNode->value);
+      char keyCh[64];
+      sprintf(keyCh, "%d ", keyNode->value);
+      fputs(keyCh, keyFile);
       keyNode = keyNode->next;
     }
 
@@ -57,34 +103,42 @@ void writeKeyListFile(struct CharList *list) {
   fclose(keyFile);
 }
 
-void readCipherBook() {
-  struct CharList *list = createCharList();
+void encrypt(char *cipherBookPath, char *originalMessage,
+             char *encryptedMessagePath, char *keysFilePath) {
+  printf("Reading '%s'\n", cipherBookPath);
+  struct CharList *charList = readCipherBook(cipherBookPath);
 
-  FILE *book = fopen("cipherBook.txt", "r");
+  printf("Writing '%s'\n", keysFilePath);
+  writeKeyListFile(charList, keysFilePath);
 
-  int lastSpace = 1;
-  char ch = getc(book);
-  while (ch != EOF) {
-    if (lastSpace && !isspace(ch) && !ispunct(ch)) {
-      ch = tolower(ch);
-      addCharacter(list, ch);
+  FILE *encryptedMessageFile = fopen(encryptedMessagePath, "w+");
+
+  int len = strlen(originalMessage);
+
+  for (int i = 0; i < len; i++) {
+    if (originalMessage[i] == ' ') {
+      fputs("-1 ", encryptedMessageFile);
+      continue;
     }
 
-    if (isspace(ch)) {
-      lastSpace = 1;
-    } else {
-      lastSpace = 0;
-    }
-    ch = getc(book);
+    struct CharNode *charNode = charListSearch(charList, originalMessage[i]);
+
+    if (!charNode)
+      continue;
+
+    char keyChar[64];
+    sprintf(keyChar, "%d", charNode->keyList->head->value);
+
+    fputs(keyChar, encryptedMessageFile);
+
+    if (i != len - 1)
+      putc(' ', encryptedMessageFile);
   }
 
-  fclose(book);
-  printList(list);
-  writeKeyListFile(list);
+  fclose(encryptedMessageFile);
 }
 
-int main() {
-  readCipherBook();
-
-  return 0;
+void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
+             char *decryptedMessagePath) {
+  readKeysFile(keysListPath);
 }
