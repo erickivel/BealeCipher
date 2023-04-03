@@ -50,24 +50,26 @@ struct CharList *readKeysFile(char *keysFilePath) {
   int lastWasLinefeed = 1;
   int lastWasSpace = 0;
   char ch = getc(keys);
-  char *numberStr = "";
+  char numberStr[64] = "";
 
   while (ch != EOF) {
     if (lastWasLinefeed) {
+      strcpy(numberStr, "");
       printf("\n%c: ", ch);
-    }
+    } else if (lastWasSpace) {
+      char chToSt[2] = "";
+      chToSt[0] = ch;
+      strcpy(numberStr, chToSt);
+    } else if (strlen(numberStr) > 0) {
 
-    if (strlen(numberStr) != 0) {
-      if (ch != ' ') {
+      if (ch == ' ') {
         printf("%s ", numberStr);
-        numberStr = "";
+        strcpy(numberStr, "");
       } else {
-        strcat(numberStr, &ch);
+        char chToStr[2] = "";
+        chToStr[0] = ch;
+        strcat(numberStr, chToStr);
       }
-    }
-
-    if (lastWasSpace) {
-      numberStr = &ch;
     }
 
     lastWasSpace = (ch == ' ') ? 1 : 0;
