@@ -52,18 +52,24 @@ struct CharList *readKeysFile(char *keysFilePath) {
   char ch = getc(keys);
   char numberStr[64] = "";
 
+  struct CharNode *currCharNode;
+  struct KeyList *currKeyList;
+
   while (ch != EOF) {
     if (lastWasLinefeed) {
       strcpy(numberStr, "");
-      printf("\n%c: ", ch);
+      // printf("\n%c: ", ch);
+      currCharNode = charListInsert(list, ch);
+      currKeyList = currCharNode->keyList;
     } else if (lastWasSpace) {
-      char chToSt[2] = "";
-      chToSt[0] = ch;
-      strcpy(numberStr, chToSt);
+      char chToStr[2] = "";
+      chToStr[0] = ch;
+      strcpy(numberStr, chToStr);
     } else if (strlen(numberStr) > 0) {
 
       if (ch == ' ') {
-        printf("%s ", numberStr);
+        keyListInsert(currKeyList, atoi(numberStr));
+        // printf("%s ", numberStr);
         strcpy(numberStr, "");
       } else {
         char chToStr[2] = "";
@@ -142,5 +148,27 @@ void encrypt(char *cipherBookPath, char *originalMessage,
 
 void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
              char *decryptedMessagePath) {
-  readKeysFile(keysListPath);
+  struct CharList *charList = readKeysFile(keysListPath);
+
+  FILE *outFile = fopen(decryptedMessagePath, "w");
+
+  if (!outFile) {
+    perror("It was not possible to open the file");
+    exit(1);
+  }
+
+  int lastWasSpace = 1;
+  char *strKey = "";
+  for (int i = 0; i < strlen(encryptedMessage); i++) {
+    if (lastWasSpace) {
+    }
+
+    if (encryptedMessage[i] == -1)
+      char *ch = keyListSearch(charList, atoi(&encryptedMessage[i]))->value;
+    if
+
+        fp
+  }
+
+  fclose(outFile);
 }
