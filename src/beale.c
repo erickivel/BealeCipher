@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "beale.h"
-#include "list.h"
+#include "../include/beale.h"
+#include "../include/list.h"
 
 int wordCount = 0;
 
@@ -90,7 +90,7 @@ struct CharList *readKeysFile(char *keysFilePath) {
 }
 
 void writeKeyListFile(struct CharList *list, char *keysFilePath) {
-  FILE *keyFile = fopen(keysFilePath, "w+");
+  FILE *keyFile = fopen(keysFilePath, "w");
 
   struct CharNode *charNode = list->head;
   while (charNode != NULL) {
@@ -148,27 +148,51 @@ void encrypt(char *cipherBookPath, char *originalMessage,
 
 void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
              char *decryptedMessagePath) {
-  struct CharList *charList = readKeysFile(keysListPath);
+
+  struct CharList *charList;
+
+  if (strlen(keysListPath) > 0) {
+    charList = readKeysFile(keysListPath);
+  } else if (strlen(cipherBookPath) > 0) {
+    charList = readCipherBook(cipherBookPath);
+  } else {
+    printf("Neither the cipher book or key list was provided");
+    exit(1);
+  }
 
   FILE *outFile = fopen(decryptedMessagePath, "w");
+  FILE *inFile = fopen(encryptedMessage, "r");
 
-  if (!outFile) {
+  if (!outFile || !inFile) {
     perror("It was not possible to open the file");
     exit(1);
   }
 
-  int lastWasSpace = 1;
-  char *strKey = "";
-  for (int i = 0; i < strlen(encryptedMessage); i++) {
-    if (lastWasSpace) {
+  int key;
+  char ch = getc(inFile);
+
+  while (ch != EOF) {
+    if (isdigit(ch) || ch == '-') {
+      ungetc(ch, inFile);
+      fscanf(inFile, "%d", &key);
+
+      char decryptedChar;
+
+      if (key == -1) {
+        decryptedChar = ' ';
+      } else {
+        decryptedChar = keyListSearch(charList, key)->value;
+        if (!decryptedChar) {
+          decryptedChar = '-';
+        }
+      }
+
+      putc(decryptedChar, outFile);
     }
 
-    if (encryptedMessage[i] == -1)
-      char *ch = keyListSearch(charList, atoi(&encryptedMessage[i]))->value;
-    if
-
-        fp
+    ch = getc(inFile);
   }
 
   fclose(outFile);
+  fclose(inFile);
 }

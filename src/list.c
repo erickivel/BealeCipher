@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "list.h"
+#include "../include/list.h"
 
 struct CharList *createCharList() {
   struct CharList *newCharList = malloc(sizeof(struct CharList));
@@ -94,14 +94,12 @@ struct CharNode *keyListSearch(struct CharList *list, int keyValue) {
   while (currentCharNode != NULL) {
     struct KeyNode *keyNode = currentCharNode->keyList->head;
 
-    if (keyNode->value < keyValue) {
-      while (keyNode != NULL && keyNode->value != keyValue) {
-        keyNode = keyNode->next;
-      }
+    while (keyNode != NULL && keyNode->value != keyValue) {
+      keyNode = keyNode->next;
+    }
 
-      if (keyNode->value == keyValue) {
-        return currentCharNode;
-      }
+    if (keyNode && keyNode->value == keyValue) {
+      return currentCharNode;
     }
 
     currentCharNode = currentCharNode->next;

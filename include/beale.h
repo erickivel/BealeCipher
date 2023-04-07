@@ -1,3 +1,5 @@
+#define BEALE_H
+
 void encrypt(char *cipherBookPath, char *originalMessage,
              char *encryptedMessagePath, char *keysFilePath);
 

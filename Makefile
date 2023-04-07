@@ -1,10 +1,8 @@
 TARGET  = beale
 
 
-# SRCDIRS = ./src/
-SRCDIRS = .
-# INCDIRS = ./include/
-INCDIRS = .
+SRCDIRS = ./src/
+INCDIRS = ./include/
 
 CC			= gcc
 CFILES		= $(foreach D, $(SRCDIRS), $(wildcard $(D)/*.c))
