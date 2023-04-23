@@ -5,3 +5,9 @@ void encrypt(char *cipherBookPath, char *originalMessage,
 
 void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
              char *decryptedMessagePath);
+
+struct CharList *readCipherBook(char *cipherBookPath);
+
+struct CharList *readKeysFile(char *keysFilePath);
+
+void writeKeyListFile(struct CharList *list, char *keysFilePath);

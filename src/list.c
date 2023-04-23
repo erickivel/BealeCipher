@@ -1,15 +1,28 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "../include/list.h"
 
 struct CharList *createCharList() {
   struct CharList *newCharList = malloc(sizeof(struct CharList));
+
+  if (!newCharList) {
+    printf("Error when creating char list");
+    exit(1);
+  }
+
   newCharList->head = NULL;
   return newCharList;
 }
 
 struct KeyList *createKeyList() {
   struct KeyList *newKeyList = malloc(sizeof(struct KeyList));
+
+  if (!newKeyList) {
+    printf("Error when creating key list");
+    exit(1);
+  }
+
   newKeyList->head = NULL;
   newKeyList->size = 0;
   return newKeyList;
@@ -17,6 +30,12 @@ struct KeyList *createKeyList() {
 
 struct CharNode *createCharNode(char charValue) {
   struct CharNode *newCharNode = malloc(sizeof(struct CharNode));
+
+  if (!newCharNode) {
+    printf("Error when creating a char node");
+    exit(1);
+  }
+
   newCharNode->value = charValue;
   newCharNode->keyList = createKeyList();
   newCharNode->next = NULL;
@@ -25,6 +44,12 @@ struct CharNode *createCharNode(char charValue) {
 
 struct KeyNode *createKeyNode(int keyValue) {
   struct KeyNode *newKeyNode = malloc(sizeof(struct KeyNode));
+
+  if (!newKeyNode) {
+    printf("Error when creating a key node");
+    exit(1);
+  }
+
   newKeyNode->next = NULL;
   newKeyNode->value = keyValue;
   return newKeyNode;

@@ -24,6 +24,11 @@ struct CharList *readCipherBook(char *cipherBookPath) {
 
   FILE *book = fopen(cipherBookPath, "r");
 
+  if (!book) {
+    perror("It was not possible to open the file");
+    exit(1);
+  }
+
   int lastSpace = 1;
   char ch = getc(book);
 
@@ -46,6 +51,11 @@ struct CharList *readKeysFile(char *keysFilePath) {
   struct CharList *list = createCharList();
 
   FILE *keys = fopen(keysFilePath, "r");
+
+  if (!keys) {
+    perror("It was not possible to open the file");
+    exit(1);
+  }
 
   int lastWasLinefeed = 1;
   int lastWasSpace = 0;
@@ -89,110 +99,111 @@ struct CharList *readKeysFile(char *keysFilePath) {
   return list;
 }
 
-void writeKeyListFile(struct CharList *list, char *keysFilePath) {
-  FILE *keyFile = fopen(keysFilePath, "w");
-
-  struct CharNode *charNode = list->head;
-  while (charNode != NULL) {
-    fputs(strncat(&charNode->value, ": ", 3), keyFile);
-    struct KeyNode *keyNode = charNode->keyList->head;
-
-    while (keyNode != NULL) {
-      char keyCh[64];
-      sprintf(keyCh, "%d ", keyNode->value);
-      fputs(keyCh, keyFile);
-      keyNode = keyNode->next;
-    }
-
-    charNode = charNode->next;
-    fputs("\n", keyFile);
-  }
-
-  fclose(keyFile);
-}
-
-void encrypt(char *cipherBookPath, char *originalMessage,
-             char *encryptedMessagePath, char *keysFilePath) {
-  printf("Reading '%s'\n", cipherBookPath);
-  struct CharList *charList = readCipherBook(cipherBookPath);
-
-  printf("Writing '%s'\n", keysFilePath);
-  writeKeyListFile(charList, keysFilePath);
-
-  FILE *encryptedMessageFile = fopen(encryptedMessagePath, "w+");
-
-  int len = strlen(originalMessage);
-
-  for (int i = 0; i < len; i++) {
-    if (originalMessage[i] == ' ') {
-      fputs("-1 ", encryptedMessageFile);
-      continue;
-    }
-
-    struct CharNode *charNode = charListSearch(charList, originalMessage[i]);
-
-    if (!charNode)
-      continue;
-
-    char keyChar[64];
-    sprintf(keyChar, "%d", charNode->keyList->head->value);
-
-    fputs(keyChar, encryptedMessageFile);
-
-    if (i != len - 1)
-      putc(' ', encryptedMessageFile);
-  }
-
-  fclose(encryptedMessageFile);
-}
-
-void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
-             char *decryptedMessagePath) {
-
-  struct CharList *charList;
-
-  if (strlen(keysListPath) > 0) {
-    charList = readKeysFile(keysListPath);
-  } else if (strlen(cipherBookPath) > 0) {
-    charList = readCipherBook(cipherBookPath);
-  } else {
-    printf("Neither the cipher book or key list was provided");
+int main(int argc, char *argv[]) {
+  if (argc > 10) {
+    printf("Too much arguments\n");
     exit(1);
   }
 
-  FILE *outFile = fopen(decryptedMessagePath, "w");
-  FILE *inFile = fopen(encryptedMessage, "r");
-
-  if (!outFile || !inFile) {
-    perror("It was not possible to open the file");
+  if (argc < 8) {
+    printf("Too few arguments\n");
     exit(1);
   }
 
-  int key;
-  char ch = getc(inFile);
+  if (!strcmp(argv[1], "-e")) {
+    printf("ENCRYPT:\n");
 
-  while (ch != EOF) {
-    if (isdigit(ch) || ch == '-') {
-      ungetc(ch, inFile);
-      fscanf(inFile, "%d", &key);
+    char *cipherBookPath = "";
+    char *originalMessage = "";
+    char *encryptedMessagePath = "";
+    char *keysFilePath = "";
 
-      char decryptedChar;
-
-      if (key == -1) {
-        decryptedChar = ' ';
-      } else {
-        decryptedChar = keyListSearch(charList, key)->value;
-        if (!decryptedChar) {
-          decryptedChar = '-';
+    for (int i = 2; i < argc; i++) {
+      if (!strcmp("-b", argv[i])) {
+        if (strlen(cipherBookPath) != 0) {
+          printf("Only one '-b' tag allowed\n");
+          exit(1);
         }
+        cipherBookPath = argv[i + 1];
+        i++;
+      } else if (!strcmp("-m", argv[i])) {
+        if (strlen(originalMessage) != 0) {
+          printf("Only one '-m' tag allowed\n");
+          exit(1);
+        }
+        originalMessage = argv[i + 1];
+        i++;
+      } else if (!strcmp("-o", argv[i])) {
+        if (strlen(encryptedMessagePath) != 0) {
+          printf("Only one '-o' tag allowed\n");
+          exit(1);
+        }
+        encryptedMessagePath = argv[i + 1];
+        i++;
+      } else if (!strcmp("-c", argv[i])) {
+        if (strlen(keysFilePath) != 0) {
+          printf("Only one '-c' tag allowed\n");
+          exit(1);
+        }
+        keysFilePath = argv[i + 1];
+        i++;
+      } else {
+        printf("Invalid '%s' tag\n", argv[i]);
+        exit(1);
       }
-
-      putc(decryptedChar, outFile);
     }
 
-    ch = getc(inFile);
+    encrypt(cipherBookPath, originalMessage, encryptedMessagePath,
+            keysFilePath);
+  } else if (!strcmp(argv[1], "-d")) {
+    printf("DECRYPT\n");
+
+    char *encryptedMessage = "";
+    char *cipherBookPath = "";
+    char *keysFilePath = "";
+    char *decryptedMessagePath = "";
+
+    for (int i = 2; i < argc; i++) {
+      if (!strcmp("-i", argv[i])) {
+        if (strlen(encryptedMessage) != 0) {
+          printf("Only one '-i' tag allowed\n");
+          exit(1);
+        }
+        encryptedMessage = argv[i + 1];
+        i++;
+      } else if (!strcmp("-b", argv[i])) {
+        if (strlen(cipherBookPath) != 0) {
+          printf("Only one '-b' tag allowed\n");
+          exit(1);
+        }
+        cipherBookPath = argv[i + 1];
+        i++;
+      } else if (!strcmp("-c", argv[i])) {
+        if (strlen(keysFilePath) != 0) {
+          printf("Only one '-c' tag allowed\n");
+          exit(1);
+        }
+        keysFilePath = argv[i + 1];
+        i++;
+      } else if (!strcmp("-o", argv[i])) {
+        if (strlen(decryptedMessagePath) != 0) {
+          printf("Only one '-o' tag allowed\n");
+          exit(1);
+        }
+        decryptedMessagePath = argv[i + 1];
+        i++;
+      } else {
+        printf("Invalid '%s' tag\n", argv[i]);
+        exit(1);
+      }
+    }
+
+    decrypt(encryptedMessage, cipherBookPath, keysFilePath,
+            decryptedMessagePath);
+  } else {
+    printf("Invalid '%s' tag", argv[1]);
+    exit(1);
   }
 
-  fclose(outFile);
-  fclose(inFile);
+  return 0;
 }
