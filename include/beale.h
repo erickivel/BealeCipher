@@ -1,3 +1,4 @@
+#ifndef BEALE_H
 #define BEALE_H
 
 void encrypt(char *cipherBookPath, char *originalMessage,
@@ -11,3 +12,5 @@ struct CharList *readCipherBook(char *cipherBookPath);
 struct CharList *readKeysFile(char *keysFilePath);
 
 void writeKeyListFile(struct CharList *list, char *keysFilePath);
+
+#endif

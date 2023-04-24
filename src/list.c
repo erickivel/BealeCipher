@@ -132,3 +132,32 @@ struct CharNode *keyListSearch(struct CharList *list, int keyValue) {
 
   return NULL;
 }
+
+void auxFreeKeyList(struct KeyNode *keyNode) {
+  if (!keyNode) {
+    return;
+  }
+
+  auxFreeKeyList(keyNode->next);
+  free(keyNode);
+}
+
+void freeKeyList(struct KeyList *keyList) {
+  auxFreeKeyList(keyList->head);
+  free(keyList);
+}
+
+void auxFreeCharList(struct CharNode *charNode) {
+  if (!charNode) {
+    return;
+  }
+
+  auxFreeCharList(charNode->next);
+  freeKeyList(charNode->keyList);
+  free(charNode);
+}
+
+void freeCharList(struct CharList *charList) {
+  auxFreeCharList(charList->head);
+  free(charList);
+}

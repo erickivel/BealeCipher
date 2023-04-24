@@ -1,3 +1,6 @@
+#ifndef LIST_H
+#define LIST_H
+
 struct KeyNode {
   int value;
   struct KeyNode *next;
@@ -29,3 +32,7 @@ struct CharNode *charListSearch(struct CharList *list, char charValue);
 void keyListInsert(struct KeyList *list, int keyValue);
 
 struct CharNode *keyListSearch(struct CharList *list, int keyValue);
+
+void freeCharList(struct CharList *charlist);
+
+#endif

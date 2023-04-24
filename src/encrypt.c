@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "../include/beale.h"
 #include "../include/list.h"
@@ -23,6 +24,7 @@ void encrypt(char *cipherBookPath, char *originalMessage,
   int len = strlen(originalMessage);
 
   for (int i = 0; i < len; i++) {
+    // Handle Space
     if (originalMessage[i] == ' ') {
       fputs("-1 ", encryptedMessageFile);
       continue;
@@ -30,17 +32,32 @@ void encrypt(char *cipherBookPath, char *originalMessage,
 
     struct CharNode *charNode = charListSearch(charList, originalMessage[i]);
 
-    if (!charNode)
+    // Handle non-existing chars on the key list
+    if (!charNode) {
+      fputs("-2 ", encryptedMessageFile);
       continue;
+    }
+
+    struct KeyNode *keyNode = charNode->keyList->head;
+
+    srand(clock());
+
+    int keyIndex = rand() % charNode->keyList->size;
 
     char keyChar[64];
-    sprintf(keyChar, "%d", charNode->keyList->head->value);
+    for (int i = 0; i < keyIndex; i++) {
+      keyNode = keyNode->next;
+    }
+
+    sprintf(keyChar, "%d", keyNode->value);
 
     fputs(keyChar, encryptedMessageFile);
 
+    // Space between each number
     if (i != len - 1)
       putc(' ', encryptedMessageFile);
   }
 
+  freeCharList(charList);
   fclose(encryptedMessageFile);
 }

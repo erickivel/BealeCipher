@@ -20,3 +20,6 @@ $(TARGET) : $(OBJFILES)
 
 clean:
 	rm -f $(TARGET) $(OBJFILES)
+
+purge: 
+	rm -f *.txt

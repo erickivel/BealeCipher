@@ -38,13 +38,14 @@ void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
 
       char decryptedChar;
 
+      // If char doesn't exist on the keylist return '#'
       if (key == -1) {
         decryptedChar = ' ';
+      } else if (key == -2) {
+        decryptedChar = '#';
       } else {
-        decryptedChar = keyListSearch(charList, key)->value;
-        if (!decryptedChar) {
-          decryptedChar = '-';
-        }
+        struct CharNode *charNode = keyListSearch(charList, key);
+        decryptedChar = charNode ? charNode->value : '#';
       }
 
       putc(decryptedChar, outFile);
@@ -53,6 +54,7 @@ void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
     ch = getc(inFile);
   }
 
+  freeCharList(charList);
   fclose(outFile);
   fclose(inFile);
 }
