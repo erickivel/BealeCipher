@@ -32,6 +32,12 @@ void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
   char ch = getc(inFile);
 
   while (ch != EOF) {
+    if (ch == '\n') {
+      putc('\n', outFile);
+      ch = getc(inFile);
+      continue;
+    }
+
     if (isdigit(ch) || ch == '-') {
       ungetc(ch, inFile);
       fscanf(inFile, "%d", &key);

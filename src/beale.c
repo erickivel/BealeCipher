@@ -21,46 +21,46 @@ int main(int argc, char *argv[]) {
     printf("ENCRYPT:\n");
 
     char *cipherBookPath = "";
-    char *originalMessage = "";
+    char *originalMessageFilePath = "";
     char *encryptedMessagePath = "";
     char *keysFilePath = "";
 
     for (int i = 2; i < argc; i++) {
       if (!strcmp("-b", argv[i])) {
         if (strlen(cipherBookPath) != 0) {
-          printf("Only one '-b' tag allowed\n");
+          printf("Only one '-b' flag allowed\n");
           exit(1);
         }
         cipherBookPath = argv[i + 1];
         i++;
       } else if (!strcmp("-m", argv[i])) {
-        if (strlen(originalMessage) != 0) {
-          printf("Only one '-m' tag allowed\n");
+        if (strlen(originalMessageFilePath) != 0) {
+          printf("Only one '-m' flag allowed\n");
           exit(1);
         }
-        originalMessage = argv[i + 1];
+        originalMessageFilePath = argv[i + 1];
         i++;
       } else if (!strcmp("-o", argv[i])) {
         if (strlen(encryptedMessagePath) != 0) {
-          printf("Only one '-o' tag allowed\n");
+          printf("Only one '-o' flag allowed\n");
           exit(1);
         }
         encryptedMessagePath = argv[i + 1];
         i++;
       } else if (!strcmp("-c", argv[i])) {
         if (strlen(keysFilePath) != 0) {
-          printf("Only one '-c' tag allowed\n");
+          printf("Only one '-c' flag allowed\n");
           exit(1);
         }
         keysFilePath = argv[i + 1];
         i++;
       } else {
-        printf("Invalid '%s' tag\n", argv[i]);
+        printf("Invalid '%s' flag\n", argv[i]);
         exit(1);
       }
     }
 
-    encrypt(cipherBookPath, originalMessage, encryptedMessagePath,
+    encrypt(cipherBookPath, originalMessageFilePath, encryptedMessagePath,
             keysFilePath);
   } else if (!strcmp(argv[1], "-d")) {
     printf("DECRYPT\n");
@@ -73,34 +73,34 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < argc; i++) {
       if (!strcmp("-i", argv[i])) {
         if (strlen(encryptedMessage) != 0) {
-          printf("Only one '-i' tag allowed\n");
+          printf("Only one '-i' flag allowed\n");
           exit(1);
         }
         encryptedMessage = argv[i + 1];
         i++;
       } else if (!strcmp("-b", argv[i])) {
         if (strlen(cipherBookPath) != 0) {
-          printf("Only one '-b' tag allowed\n");
+          printf("Only one '-b' flag allowed\n");
           exit(1);
         }
         cipherBookPath = argv[i + 1];
         i++;
       } else if (!strcmp("-c", argv[i])) {
         if (strlen(keysFilePath) != 0) {
-          printf("Only one '-c' tag allowed\n");
+          printf("Only one '-c' flag allowed\n");
           exit(1);
         }
         keysFilePath = argv[i + 1];
         i++;
       } else if (!strcmp("-o", argv[i])) {
         if (strlen(decryptedMessagePath) != 0) {
-          printf("Only one '-o' tag allowed\n");
+          printf("Only one '-o' flag allowed\n");
           exit(1);
         }
         decryptedMessagePath = argv[i + 1];
         i++;
       } else {
-        printf("Invalid '%s' tag\n", argv[i]);
+        printf("Invalid '%s' flag\n", argv[i]);
         exit(1);
       }
     }
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     decrypt(encryptedMessage, cipherBookPath, keysFilePath,
             decryptedMessagePath);
   } else {
-    printf("Invalid '%s' tag", argv[1]);
+    printf("Invalid '%s' flag", argv[1]);
     exit(1);
   }
 
