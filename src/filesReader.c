@@ -58,35 +58,22 @@ struct CharList *readKeysFile(char *keysFilePath) {
   }
 
   int lastWasLinefeed = 1;
-  int lastWasSpace = 0;
   char ch = getc(keys);
-  char numberStr[64] = "";
+  int keyNumber;
 
   struct CharNode *currCharNode;
   struct KeyList *currKeyList;
 
   while (ch != EOF) {
     if (lastWasLinefeed) {
-      strcpy(numberStr, "");
       currCharNode = charListInsert(list, ch);
       currKeyList = currCharNode->keyList;
-    } else if (lastWasSpace) {
-      char chToStr[2] = "";
-      chToStr[0] = ch;
-      strcpy(numberStr, chToStr);
-    } else if (strlen(numberStr) > 0) {
-
-      if (ch == ' ') {
-        keyListInsert(currKeyList, atoi(numberStr));
-        strcpy(numberStr, "");
-      } else {
-        char chToStr[2] = "";
-        chToStr[0] = ch;
-        strcat(numberStr, chToStr);
-      }
+    } else if (isdigit(ch)) {
+      ungetc(ch, keys);
+      fscanf(keys, "%d", &keyNumber);
+      keyListInsert(currKeyList, keyNumber);
     }
 
-    lastWasSpace = (ch == ' ') ? 1 : 0;
     lastWasLinefeed = (ch == '\n') ? 1 : 0;
 
     ch = getc(keys);

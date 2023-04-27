@@ -19,9 +19,7 @@ void writeKeyListFile(struct CharList *list, char *keysFilePath) {
     struct KeyNode *keyNode = charNode->keyList->head;
 
     while (keyNode) {
-      char keyCh[64];
-      sprintf(keyCh, "%d ", keyNode->value);
-      fputs(keyCh, keyFile);
+      fprintf(keyFile, "%d ", keyNode->value);
       keyNode = keyNode->next;
     }
 
