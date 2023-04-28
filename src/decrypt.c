@@ -6,8 +6,9 @@
 #include "../include/beale.h"
 #include "../include/list.h"
 
-void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
-             char *decryptedMessagePath) {
+void decrypt(char *encryptedMessagePath, char *cipherBookPath,
+             char *keysListPath, char *decryptedMessagePath) {
+  printf("DECRYPT:\n");
 
   struct CharList *charList;
 
@@ -21,13 +22,15 @@ void decrypt(char *encryptedMessage, char *cipherBookPath, char *keysListPath,
   }
 
   FILE *outFile = fopen(decryptedMessagePath, "w");
-  FILE *inFile = fopen(encryptedMessage, "r");
+  FILE *inFile = fopen(encryptedMessagePath, "r");
 
   if (!outFile || !inFile) {
     perror("It was not possible to open the file");
     exit(1);
   }
 
+  printf("Decrypting Encrypted Message ('%s') on file '%s'...\n",
+         encryptedMessagePath, decryptedMessagePath);
   int key;
   char ch = getc(inFile);
 

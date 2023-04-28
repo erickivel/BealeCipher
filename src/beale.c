@@ -18,8 +18,6 @@ int main(int argc, char *argv[]) {
   }
 
   if (!strcmp(argv[1], "-e")) {
-    printf("ENCRYPT:\n");
-
     char *cipherBookPath = "";
     char *originalMessageFilePath = "";
     char *encryptedMessagePath = "";
@@ -63,8 +61,6 @@ int main(int argc, char *argv[]) {
     encrypt(cipherBookPath, originalMessageFilePath, encryptedMessagePath,
             keysFilePath);
   } else if (!strcmp(argv[1], "-d")) {
-    printf("DECRYPT\n");
-
     char *encryptedMessage = "";
     char *cipherBookPath = "";
     char *keysFilePath = "";

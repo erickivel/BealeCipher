@@ -9,10 +9,10 @@
 
 void encrypt(char *cipherBookPath, char *originalMessageFilePath,
              char *encryptedMessagePath, char *keysFilePath) {
-  printf("Reading '%s'\n", cipherBookPath);
+  printf("ENCRYPT:\n");
+
   struct CharList *charList = readCipherBook(cipherBookPath);
 
-  printf("Writing '%s'\n", keysFilePath);
   writeKeyListFile(charList, keysFilePath);
 
   FILE *encryptedMessageFile = fopen(encryptedMessagePath, "w");
@@ -23,6 +23,8 @@ void encrypt(char *cipherBookPath, char *originalMessageFilePath,
     exit(1);
   }
 
+  printf("Encrypting Original Message ('%s') on file '%s'...\n",
+         originalMessageFilePath, encryptedMessagePath);
   int ch = getc(originalMessageFile);
 
   while (ch != EOF) {
@@ -37,9 +39,6 @@ void encrypt(char *cipherBookPath, char *originalMessageFilePath,
     }
 
     struct CharNode *charNode = charListSearch(charList, tolower(ch));
-
-    if (isspace(ch))
-      printf("%c: %d\n", ch, isalnum(ch));
 
     // Handle non-existing chars on the key list
     if (!charNode) {

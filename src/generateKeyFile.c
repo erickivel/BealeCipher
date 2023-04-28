@@ -6,6 +6,8 @@
 #include "../include/list.h"
 
 void writeKeyListFile(struct CharList *list, char *keysFilePath) {
+  printf("Writing keys file: '%s'...\n", keysFilePath);
+
   FILE *keyFile = fopen(keysFilePath, "w");
 
   if (!keyFile) {

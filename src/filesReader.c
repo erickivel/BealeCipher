@@ -20,6 +20,8 @@ void addCharacter(struct CharList *list, char ch) {
 }
 
 struct CharList *readCipherBook(char *cipherBookPath) {
+  printf("Reading Cipher Book: '%s'...\n", cipherBookPath);
+
   struct CharList *list = createCharList();
 
   FILE *book = fopen(cipherBookPath, "r");
@@ -48,6 +50,8 @@ struct CharList *readCipherBook(char *cipherBookPath) {
 }
 
 struct CharList *readKeysFile(char *keysFilePath) {
+  printf("Reading Keys File: '%s'...\n", keysFilePath);
+
   struct CharList *list = createCharList();
 
   FILE *keys = fopen(keysFilePath, "r");
