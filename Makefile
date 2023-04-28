@@ -1,19 +1,18 @@
 TARGET  = beale
 
-
-SRCDIRS = ./src/
-INCDIRS = ./include/
+SRCDIR = ./src/
+INCDIR = ./include/
 
 CC			= gcc
-CFILES		= $(foreach D, $(SRCDIRS), $(wildcard $(D)/*.c))
+CFILES		= $(wildcard $(SRCDIR)/*.c)
 CFLAGS		= -Wall -Wextra -pedantic -std=c99
-LDFLAGS		= $(foreach D, $(INCDIRS), -I$(D))
+LDFLAGS		= -I$(INCDIR)
 OBJFILES	= $(patsubst %.c, %.o, $(CFILES))
 
 all: $(TARGET)
 
 $(TARGET) : $(OBJFILES)
-	$(CC) -o $@ $^ $(LBFLAGS)
+	$(CC) -o $@ $^
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -c -o $@ $^
