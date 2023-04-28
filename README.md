@@ -1,6 +1,8 @@
-=== Beale Ciphers ===
+# === Beale Ciphers ===
 
-* Program Execution Flow
+## Project Overview
+
+## Program Execution Flow
   The main function is on beale.c where it receives the program arguments, verifies if the number of arguments is correct,
   if the flags provided are valid, if the flags aren't duplicated, then execute the 'encrypt' or 'decrypt' function.
 
@@ -9,13 +11,13 @@
   - Decrypt:
     beale.c -> decrypt.c -> filesReader.c (read Cipher Book or Keys File) -> list.c (search numbers/keys to find the decrypted characters) -> write output file (Decrypted Message).
 
-* Main Data Structures
+## Main Data Structures
   The main data structure is declared on list.h, it consists of a linked list of characters (struct CharList)
   where each character node (struct CharNode) has its own linked list of keys/numbers (struct KeyList),
   this KeyList is made of key nodes (struct KeyNode).
 
 
-* Main Algorithms
+## Main Algorithms
   - readCipherBook: 
     Implemented on filesReader.c its main function is to translate the Cipher Book to a struct CharList. 
     To accomplish that the function reads character by character of the Cipher book, when a space (' ') is identified
