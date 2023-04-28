@@ -21,4 +21,4 @@ clean:
 	rm -f $(TARGET) $(OBJFILES)
 
 purge: 
-	rm -f *.txt
+	rm -f $(TARGET) $(OBJFILES) *.txt
